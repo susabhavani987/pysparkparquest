@@ -35,17 +35,10 @@ jobs:
         run: |
           python app.py  # Replace with your main PySpark script
 
-      # 5️⃣ Package and upload to S3 (for deployment)
       - name: Upload PySpark script to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2  # change as needed
-       run: |
+        run: |
           aws s3 cp app.py s3://my-bucket/pyspark-scripts/app.py --acl bucket-owner-full-control
-        
-
-      # 6️⃣ (Optional) Trigger EMR job
-      # - name: Submit job to EMR
-      #   run: |
-      #     aws emr add-steps --cluster-id j-XXXXXXXX --steps Type=Spark,Name="PySparkJob",ActionOnFailure=CONTINUE,Args=[--deploy-mode,cluster,--master,yarn,s3://my-bucket/pyspark-scripts/app.py]
