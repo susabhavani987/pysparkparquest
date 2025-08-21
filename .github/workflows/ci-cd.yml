@@ -1,0 +1,49 @@
+name: PySpark CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Set up Python
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      # 3️⃣ Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyspark boto3 pyarrow pandas
+
+      # 4️⃣ Run tests (optional)
+      - name: Run PySpark script for testing
+        run: |
+          python app.py  # Replace with your main PySpark script
+
+      # 5️⃣ Package and upload to S3 (for deployment)
+      - name: Upload PySpark script to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1  # change as needed
+        run: |
+          aws s3 cp app.py s3://my-bucket/pyspark-scripts/app.py --acl bucket-owner-full-control
+
+      # 6️⃣ (Optional) Trigger EMR job
+      # - name: Submit job to EMR
+      #   run: |
+      #     aws emr add-steps --cluster-id j-XXXXXXXX --steps Type=Spark,Name="PySparkJob",ActionOnFailure=CONTINUE,Args=[--deploy-mode,cluster,--master,yarn,s3://my-bucket/pyspark-scripts/app.py]
