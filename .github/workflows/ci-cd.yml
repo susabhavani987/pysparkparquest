@@ -42,7 +42,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2  # change as needed
        run: |
-      aws s3 cp app.py s3://my-bucket/pyspark-scripts/app.py --acl bucket-owner-full-control
+          aws s3 cp app.py s3://my-bucket/pyspark-scripts/app.py --acl bucket-owner-full-control
+        
 
       # 6️⃣ (Optional) Trigger EMR job
       # - name: Submit job to EMR
