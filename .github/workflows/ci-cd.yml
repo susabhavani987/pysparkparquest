@@ -28,8 +28,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyspark boto3 pyarrow pandas
-
+          pip install pyspark boto3 
+          
       # 4️⃣ Run tests (optional)
       - name: Run PySpark script for testing
         run: |
@@ -41,9 +41,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2  # change as needed
-        run: |
-          aws s3 cp app.py s3://lordvishnubucket1/output/app.py --acl bucket-owner-full-control
-
+      
       # 6️⃣ (Optional) Trigger EMR job
       # - name: Submit job to EMR
       #   run: |
