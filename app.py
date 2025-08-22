@@ -1,46 +1,31 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Aug 21 20:27:51 2025
+
+@author: vij_c
+"""
 from pyspark.sql import SparkSession
 
-# ----------------------------
-# 1️⃣ Initialize Spark Session
-# ----------------------------
+# Start Spark
+
 spark = SparkSession.builder \
-    .appName("S3ToParquet") \
-    .getOrCreate()
+    .appName("ParquetExample") \
+           .getOrCreate()
 
-# ----------------------------
-# 2️⃣ S3 Configuration
-# ----------------------------
-# Option 1: Using environment variables or IAM role
-input_bucket_path = "s3://lordvishnubucket1/customers.csv"
-output_bucket_path = "s3://lordvishnubucket1/parquet-output"
+# Sample DataFrame
+data = [
+    (1, "Alice", 29),
+    (2, "Bob", 35),
+    (3, "Charlie", 50)
+]
+columns = ["id", "name", "age"]
 
-# Option 2: Using explicit AWS credentials (not recommended for production)
-# spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", "YOUR_AWS_ACCESS_KEY")
-# spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", "YOUR_AWS_SECRET_KEY")
-# spark._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.amazonaws.com")
+df = spark.createDataFrame(data, columns)
 
-# ----------------------------
-# 3️⃣ Read Input File from S3
-# ----------------------------
-# Supports CSV, JSON, Parquet, etc.
-df = spark.read.option("header", True).csv(input_bucket_path)
+# Write DataFrame to Parquet
+df.write.mode("overwrite").parquet("output/customers.parquet")
+print("✅ Parquet file written to output/customers.parquet")
 
-print("✅ Input Data Sample:")
-df.show(5)
-
-# ----------------------------
-# 4️⃣ Write DataFrame to S3 in Parquet format
-df.write \
-  .mode("overwrite") \
-  .partitionBy("year", "month") \
-  .parquet(output_bucket_path)
-
-# ----------------------------
-
-
-print(f"✅ Data successfully written to {output_bucket_path}")
-
-# ----------------------------
-# 5️⃣ Stop Spark Session
-# ----------------------------
-spark.stop()
+# Read it back
+parquet_df = spark.read.parquet("output/customers.parquet")
+parquet_df.show()
