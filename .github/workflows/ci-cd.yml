@@ -31,6 +31,13 @@ jobs:
 
       - name: Run PySpark job
         run: |
+          mkdir -p output
           python app.py
+          
+      - name: Upload Parquet file
+        uses: actions/upload-artifact@v3
+        with:
+          name: customers-parquet
+          path: output/customers.parquet
 
 
